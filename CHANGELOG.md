@@ -5,6 +5,48 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.4.3](https://github.com/mcarvin8/sf-decomposer/compare/v7.4.2...v7.4.3) (2026-09-09)
+
+
+### Bug Fixes
+
+* **rust:** add XML round-trip fuzz harness, bump config-disassembler to 3.4.7 ([#602](https://github.com/mcarvin8/sf-decomposer/issues/602)) ([7863bb1](https://github.com/mcarvin8/sf-decomposer/commit/7863bb19780bd04077e70d7abf882a7524392dfe))
+
+## [7.4.2](https://github.com/mcarvin8/sf-decomposer/compare/v7.4.1...v7.4.2) (2026-09-08)
+
+
+### Bug Fixes
+
+* **recompose:** preserve CustomLabels trailing newline, tighten perf byte-retention to 100% ([#599](https://github.com/mcarvin8/sf-decomposer/issues/599)) ([3c19e4b](https://github.com/mcarvin8/sf-decomposer/commit/3c19e4b90ed27e1f532771038ca5dca1e63fd9c6))
+
+## [7.4.1](https://github.com/mcarvin8/sf-decomposer/compare/v7.4.0...v7.4.1) (2026-09-08)
+
+
+### Bug Fixes
+
+* **deps:** bump config-disassembler to 3.4.2 ([#597](https://github.com/mcarvin8/sf-decomposer/issues/597)) ([4e6a1dc](https://github.com/mcarvin8/sf-decomposer/commit/4e6a1dc0a72fd5c503147b02c33214a54a7f03bc))
+
+## [7.4.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.3.4...v7.4.0) (2026-09-04)
+
+
+### Features
+
+* **metadata:** refresh SDR registry to 13.3.1 ([#595](https://github.com/mcarvin8/sf-decomposer/issues/595)) ([759faab](https://github.com/mcarvin8/sf-decomposer/commit/759faabf1527702040fe9c2b3d369dffbd9e1236))
+
+## [7.3.4](https://github.com/mcarvin8/sf-decomposer/compare/v7.3.3...v7.3.4) (2026-09-03)
+
+
+### Bug Fixes
+
+* **deps:** bump config-disassembler to 3.4.1 ([#591](https://github.com/mcarvin8/sf-decomposer/issues/591)) ([9b1ca2f](https://github.com/mcarvin8/sf-decomposer/commit/9b1ca2f8066f7171b3ac923040ad6e05de340ad2))
+
+## [7.3.3](https://github.com/mcarvin8/sf-decomposer/compare/v7.3.2...v7.3.3) (2026-09-02)
+
+
+### Bug Fixes
+
+* **deps:** bump the dependencies group across 2 directories with 4 updates ([#589](https://github.com/mcarvin8/sf-decomposer/issues/589)) ([1ce31d1](https://github.com/mcarvin8/sf-decomposer/commit/1ce31d12bd76cf101c3a8a8d26d813ca50fcc50f))
+
 ## [7.3.2](https://github.com/mcarvin8/sf-decomposer/compare/v7.3.1...v7.3.2) (2026-08-25)
 
 

@@ -14,11 +14,11 @@ const rootPackageJson = JSON.parse(readFileSync(resolve(process.cwd(), 'package.
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
 };
-const runtimePackageJson = JSON.parse(
-  readFileSync(resolve(process.cwd(), 'docker/action-runtime-package.json'), 'utf-8'),
-) as { dependencies: Record<string, string> };
+const runtimePackageJson = JSON.parse(readFileSync(resolve(process.cwd(), 'docker/package.json'), 'utf-8')) as {
+  dependencies: Record<string, string>;
+};
 
-describe('docker/action-runtime-package.json', () => {
+describe('docker/package.json', () => {
   it('pins config-disassembler to the same version as the repo dependency', () => {
     expect(runtimePackageJson.dependencies['config-disassembler']).toBe(
       rootPackageJson.dependencies['config-disassembler'],
