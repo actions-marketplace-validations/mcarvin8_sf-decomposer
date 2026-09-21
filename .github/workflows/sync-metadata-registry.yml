@@ -26,7 +26,7 @@ jobs:
       # downstream pull_request-triggered workflows (test.yml, megalinter, etc.) run
       # automatically like on any other PR.
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           token: ${{ secrets.RELEASE_PAT }}
 
