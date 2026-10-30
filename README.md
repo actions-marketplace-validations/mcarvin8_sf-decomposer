@@ -4,7 +4,6 @@
 [![Downloads/week](https://img.shields.io/npm/dw/sf-decomposer.svg)](https://npmjs.com/package/sf-decomposer)
 [![GitHub Marketplace](https://img.shields.io/badge/marketplace-sf--decomposer-blue?logo=github)](https://github.com/marketplace/actions/sf-decomposer)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/mcarvin8/sf-decomposer/main/LICENSE.md)
-[![Maintainability](https://qlty.sh/badges/8492c1c6-0f93-4d37-bfad-32fd3b788a2d/maintainability.svg)](https://qlty.sh/gh/mcarvin8/projects/sf-decomposer)
 [![codecov](https://codecov.io/gh/mcarvin8/sf-decomposer/graph/badge.svg?token=YFU52L4XM5)](https://codecov.io/gh/mcarvin8/sf-decomposer)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fmcarvin8%2Fsf-decomposer%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/mcarvin8/sf-decomposer/main)
 [![Performance](https://img.shields.io/badge/Performance-Dashboard-58a6ff)](https://mcarvin8.github.io/sf-decomposer/dev/bench/runtime/)
@@ -34,8 +33,8 @@
   - [Ignore Files](#ignore-files)
   - [Using with sfdx-git-delta](#using-with-sfdx-git-delta)
   - [Troubleshooting](#troubleshooting)
-  - [Built With](#built-with)
-- [Migrating from Salesforce Native Decomposition](#migrating-from-salesforce-native-decomposition)
+- [Built With](#built-with)
+- [Migrating from Native Decomposition](#migrating-from-native-decomposition)
 - [Contributing](#contributing)
 - [Issues](#issues)
 - [License](#license)
@@ -221,7 +220,7 @@ EXAMPLES
   `sf decomposer decompose -x "manifest/package.xml" -m "flow"`
 ```
 
-_See code: [src/commands/decomposer/decompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.5.0/src/commands/decomposer/decompose.ts)_
+_See code: [src/commands/decomposer/decompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.7.0/src/commands/decomposer/decompose.ts)_
 
 ## `sf decomposer recompose`
 
@@ -267,7 +266,7 @@ EXAMPLES
   `sf decomposer recompose -x "manifest/package.xml" -m "flow"`
 ```
 
-_See code: [src/commands/decomposer/recompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.5.0/src/commands/decomposer/recompose.ts)_
+_See code: [src/commands/decomposer/recompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.7.0/src/commands/decomposer/recompose.ts)_
 
 ## `sf decomposer verify`
 
@@ -331,7 +330,7 @@ EXAMPLES
   `sf decomposer verify -x "manifest/package.xml" --config`
 ```
 
-_See code: [src/commands/decomposer/verify.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.5.0/src/commands/decomposer/verify.ts)_
+_See code: [src/commands/decomposer/verify.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.7.0/src/commands/decomposer/verify.ts)_
 <!-- commandsstop -->
 
 ---
@@ -550,6 +549,8 @@ All parent and child metadata types from this plugin's vendored copy of the [@sa
 
 Use the metadata **suffix** for `-m` / `--metadata-type`, as in the vendored [`metadataRegistry.json`](src/metadata/registry/metadataRegistry.json) (synced weekly from upstream SDR — see [`sync-metadata-registry.yml`](.github/workflows/sync-metadata-registry.yml)), or infer from the file name: `*.{suffix}-meta.xml`.
 
+**Common Examples:**
+
 | Metadata Type                 | CLI value                     | Notes                                                                                                                                                                                                                                                                                                                 |
 |-------------------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Custom Labels                 | `labels`                      | Strategy overridden to `unique-id` if `grouped-by-tag` is provided (grouping labels by tag would be no different from the original file).                                                                                                                                                                             |
@@ -753,6 +754,29 @@ No directories named ${metadataTypeEntry.directoryName} were found in any packag
 
 For example, if you attempt to decompose Custom Labels but none of your package directories contain a "labels" folder, the plugin will throw this error.
 
+#### Removing References to Deleted or Uninstalled Metadata
+
+Permission sets, profiles, and similar files keep references to objects, fields, classes, and pages even after those components are deleted from the org or their managed package is uninstalled. Deploys then fail on the stale references. Salesforce does not remove these entries for you.
+
+With the `unique-id` strategy, each reference is its own file named after the component it points to, so removing a reference means deleting that file and recomposing. The plugin rebuilds the XML from whatever files remain.
+
+```bash
+# 1. Decompose with unique-id (the default)
+sf decomposer decompose -m "permissionset" -m "profile"
+
+# 2. Delete the decomposed files for the stale components, e.g. an uninstalled "oldns" package
+find force-app -path "*permissionsets/*" -name "*oldns__*" -delete
+find force-app -path "*profiles/*" -name "*oldns__*" -delete
+
+# 3. Review what was removed, then recompose
+git status
+sf decomposer recompose -m "permissionset" -m "profile"
+```
+
+You can delete single files, whole folders (for example every `classAccesses/` entry), or pattern matches across many components. Check every folder: references to namespaced components show up in `objectPermissions/`, `fieldPermissions/`, `tabSettings/`, `recordTypeVisibilities/`, `classAccesses/`, `pageAccesses/`, and others. Grep the decomposed tree for the namespace or component name before recomposing, and review the diff to confirm nothing else matched the pattern.
+
+This cleanup doesn't work with `grouped-by-tag`, because all entries for a tag share one file. Run step 1 with `-s unique-id --prepurge` to switch first. The `--decompose-nested-permissions` layout splits only `objectPermissions/` and `fieldPermissions/` by object; other tags stay grouped.
+
 #### XML disassemble output (Rust crate)
 
 The underlying Rust crate logs through [env_logger](https://docs.rs/env_logger). Set `RUST_LOG` to opt into more verbosity:
@@ -774,16 +798,16 @@ Example `WARN` (CustomApplication where four `actionOverrides` siblings shared t
 
 ---
 
-### Built With
+## Built With
 
 - [config-disassembler-node](https://github.com/mcarvin8/config-disassembler-node) – Disassemble XML (and other config formats) into smaller, manageable files and reassemble when needed. Node.js + Rust (NAPI-RS).
 - [@salesforce/source-deploy-retrieve](https://github.com/forcedotcom/source-deploy-retrieve) – Source of the vendored metadata registry (`src/metadata/registry/metadataRegistry.json`), synced weekly. Not a runtime dependency — this plugin ships its own minimal registry lookup and package.xml parser instead.
 
 ---
 
-## Migrating from Salesforce Native Decomposition
+## Migrating from Native Decomposition
 
-Already using `decomposePermissionSetBeta2`, `decomposeCustomLabelsBeta`, or similar flags? See [MIGRATION.md](https://github.com/mcarvin8/sf-decomposer/blob/main/MIGRATION.md) before installing sf-decomposer on that project.
+Already using Salesforce CLI built-in `decomposePermissionSetBeta2`, `decomposeCustomLabelsBeta`, or similar presets? See [MIGRATION.md](https://github.com/mcarvin8/sf-decomposer/blob/main/MIGRATION.md) before switching over to sf-decomposer.
 
 ---
 
@@ -801,4 +825,6 @@ Please open an [issue](https://github.com/mcarvin8/sf-decomposer/issues) to repo
 
 ## License
 
-[MIT](LICENSE.md)
+[MIT](LICENSE.md). Bundled third-party material (Salesforce's metadata
+registry from `@salesforce/source-deploy-retrieve`, Apache-2.0) is listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

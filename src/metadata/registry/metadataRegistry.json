@@ -607,7 +607,10 @@
         "cnfgItemTypeRelationDef": "cnfgitemtyperelationdef",
         "cnfgMgmtRelationTypeDef": "cnfgmgmtrelationtypedef",
         "meetingPlaybookDefinition": "meetingplaybookdefinition",
-        "idpConfiguration": "idpconfiguration"
+        "idpConfiguration": "idpconfiguration",
+        "ecaAttest": "extlclntappattestsettings",
+        "ecaAttestPlcy": "extlclntappattestconfigurablepolicies",
+        "genOpPlanEligibilityConfig": "genopplaneligibilityconfig"
     },
     "types": {
         "accesscontrolpolicy": {
@@ -790,7 +793,9 @@
             "inFolder": false,
             "strictDirectoryName": true,
             "versionSeparator": "#",
-            "strategies": { "adapter": "bundle" }
+            "strategies": {
+                "adapter": "bundle"
+            }
         },
         "aiagentscorerdefinition": {
             "directoryName": "aiAgentScorerDefinitions",
@@ -5422,6 +5427,30 @@
                 "adapter": "bundle"
             },
             "supportsPartialDelete": true
+        },
+        "extlclntappattestsettings": {
+            "id": "extlclntappattestsettings",
+            "name": "ExtlClntAppAttestSettings",
+            "suffix": "ecaAttest",
+            "directoryName": "extlClntAppAttestSettings",
+            "inFolder": false,
+            "strictDirectoryName": false
+        },
+        "extlclntappattestconfigurablepolicies": {
+            "id": "extlclntappattestconfigurablepolicies",
+            "name": "ExtlClntAppAttestConfigurablePolicies",
+            "suffix": "ecaAttestPlcy",
+            "directoryName": "extlClntAppAttestPolicies",
+            "inFolder": false,
+            "strictDirectoryName": false
+        },
+        "genopplaneligibilityconfig": {
+            "id": "genopplaneligibilityconfig",
+            "name": "GenOpPlanEligibilityConfig",
+            "suffix": "genOpPlanEligibilityConfig",
+            "directoryName": "GenOpPlanEligibilityConfig",
+            "inFolder": false,
+            "strictDirectoryName": false
         }
     }
 }

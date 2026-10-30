@@ -5,6 +5,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.7.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.6.0...v7.7.0) (2026-10-26)
+
+
+### Features
+
+* **metadata:** support GenOpPlanEligibilityConfig ([#613](https://github.com/mcarvin8/sf-decomposer/issues/613)) ([d429449](https://github.com/mcarvin8/sf-decomposer/commit/d429449d88e8981a856ffe05793c19c37dc222bf))
+
+## [7.6.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.5.1...v7.6.0) (2026-10-19)
+
+
+### Features
+
+* **metadata:** support 2 new metadata types ([#611](https://github.com/mcarvin8/sf-decomposer/issues/611)) ([b5c7784](https://github.com/mcarvin8/sf-decomposer/commit/b5c778437e688874af47f39f19fa1c06bbe534bf))
+
+## [7.5.1](https://github.com/mcarvin8/sf-decomposer/compare/v7.5.0...v7.5.1) (2026-10-13)
+
+
+### Bug Fixes
+
+* **deps:** bump the dependencies group across 1 directory with 3 updates ([#608](https://github.com/mcarvin8/sf-decomposer/issues/608)) ([3eb83c0](https://github.com/mcarvin8/sf-decomposer/commit/3eb83c0acc4cbd918f251a209c37adb1c66b789a))
+* ship Apache-2.0 notice for vendored SDR registry and ported code ([#610](https://github.com/mcarvin8/sf-decomposer/issues/610)) ([a2d526a](https://github.com/mcarvin8/sf-decomposer/commit/a2d526a3a85baae01cd3e01bb9064deab89aa5c6))
+
 ## [7.5.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.4.3...v7.5.0) (2026-09-21)
 
 
