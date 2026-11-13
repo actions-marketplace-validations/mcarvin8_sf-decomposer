@@ -138,7 +138,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           # Don't leave the token in .git/config for PR code to read. The
           # base-ref fetch below works without it (public repo).
@@ -409,7 +409,7 @@ jobs:
         profile: ${{ inputs.profile && fromJSON(format('["{0}"]', inputs.profile)) || fromJSON('["large","manyfiles","manyfiles-overrides"]') }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Download benchmark JSON
         uses: actions/download-artifact@v8
