@@ -6,7 +6,7 @@ This handbook collects ready-to-paste `.sfdecomposer.config.json` recipes for th
 - recomposes back to a **byte-identical** XML deployable to any org,
 - is verified by `sf decomposer verify` before you commit it.
 
-If you want the underlying option grammar instead of recipes, see the [main README](./README.md#per-type--per-component-overrides).
+If you want the underlying option grammar instead of recipes, see the [main README](../README.md#per-type--per-component-overrides).
 
 ## Contents
 
@@ -24,7 +24,7 @@ If you want the underlying option grammar instead of recipes, see the [main READ
 Three knobs cover almost every case:
 
 | Symptom of the source XML                                                                     | Reach for                                                                                          |
-|-----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | One repeating section at the top level (e.g. `<labels>` of a custom-labels file).             | `strategy: unique-id` (default).                                                                   |
 | Lots of small repeatable tags, you want one file per tag-name, not per-instance.              | `strategy: grouped-by-tag`.                                                                        |
 | `grouped-by-tag`, but a few specific tags (e.g. `objectPermissions`) need finer-grained diff. | Add `splitTags`.                                                                                   |
@@ -38,11 +38,11 @@ Hard rules the plugin always enforces (so you don't have to):
 Built-in `multiLevel` defaults — applied automatically when `strategy` is `unique-id` and you do not supply your own `multiLevel` for that type. You can replace any of them by setting an explicit `multiLevel` on the override.
 
 | Metadata type         | Built-in `multiLevel`                                               |
-|-----------------------|---------------------------------------------------------------------|
+| --------------------- | ------------------------------------------------------------------- |
 | `bot`                 | `["botDialogs:botDialogs:developerName", "botSteps:botSteps:type"]` |
 | `loyaltyProgramSetup` | `"programProcesses:programProcesses:parameterName,ruleName"`        |
 
-The full registry lives in [`src/metadata/multiLevelDefaults.ts`](./src/metadata/multiLevelDefaults.ts).
+The full registry lives in [`src/metadata/multiLevelDefaults.ts`](../src/metadata/multiLevelDefaults.ts).
 
 Everything else in this handbook is opt-in.
 
@@ -309,7 +309,7 @@ layouts/
 These follow the same pattern; pick the rules that match your repo's data. None of these are decomposed natively by Salesforce.
 
 | Metadata type                              | Suggested override                                                                                                                                                                                                                                        |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `flow`                                     | `multiLevel: ["actionCalls:actionCalls:name", "decisions:decisions:name", "rules:rules:name"]`                                                                                                                                                            |
 | `globalValueSet`                           | `multiLevel: ["customValue:customValue:fullName"]` — handy when value sets have hundreds of picks.                                                                                                                                                        |
 | `field` (CustomField)                      | `multiLevel: "valueSet:valueSetDefinition:fullName"` — splits each picklist value into its own file. Only effective on fields that define picklist values inline; fields referencing a global value set or non-picklist fields are leaf-only and skipped. |
@@ -337,7 +337,7 @@ sf decomposer recompose -m "bot"
 sf decomposer verify -m "bot" --config
 ```
 
-`sf decomposer verify` is non-destructive: for each parent metadata XML file it disassembles and reassembles a copy in an isolated temp directory and compares the result to your committed source. If anything drifts (content, missing file, sibling reorder) it tells you exactly which paths broke. Treat any drift as a blocker — fix the override (or fall back to the previous one) before committing.
+`sf decomposer verify` is non-destructive: for each parent metadata XML file it disassembles and reassembles a copy in an isolated temp directory and compares the result to your committed source. If anything drifts (content, missing file) it tells you exactly which paths broke; files whose only change is element order are listed separately as "reordered" and don't fail the run. Treat any drift as a blocker — fix the override (or fall back to the previous one) before committing.
 
 ---
 

@@ -1,0 +1,34 @@
+---
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "/docker"
+      - "/packages/core"
+    schedule:
+      interval: "weekly"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "build(npm)"
+    allow:
+      - dependency-type: "direct"
+    groups:
+      config-disassembler:
+        patterns:
+          - "config-disassembler"
+      npm:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "config-disassembler"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "build(github-actions)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

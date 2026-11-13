@@ -1,7 +1,5 @@
 'use strict';
 
-import { Command, Config } from '@oclif/core';
-
 export type DecomposerResult = {
   metadata: string[];
 };
@@ -73,28 +71,13 @@ export type SfdxProject = {
 };
 
 export type MetaAttributes = {
+  /** The `--metadata-type` value the type was selected by (suffix or type name); overrides are keyed by it. */
+  metadataType?: string;
   metaSuffix: string;
   strictDirectoryName: boolean;
   folderType: string;
   metadataPaths: string[];
   uniqueIdElements: string;
-};
-
-// Local stand-in for SDR's ScopedPostRetrieve -- only the field the hook actually reads.
-type RetrieveHookResult = {
-  retrieveResult: {
-    response: {
-      status?: string;
-    };
-  };
-};
-
-export type PostRetrieveHookOptions = {
-  Command: Command;
-  argv: string[];
-  commandId: string;
-  result?: RetrieveHookResult;
-  config: Config;
 };
 
 export type DecomposeOptions = {
@@ -146,8 +129,10 @@ export type VerifyResult = {
   /** One entry per file that did not survive the round trip semantically. Empty on success. */
   drift: VerifyDrift[];
   /**
-   * Files where the only delta was sibling/attribute ordering — content is semantically identical
-   * but not byte-identical. Reported for awareness; does not fail `verify`.
+   * Files where the only delta was element ordering — content is semantically identical but not
+   * byte-identical. Repeated siblings keep their order, so this only covers order the round trip
+   * can't record (interleaved tags, grouped-by-tag `group` rules). Does not fail `verify`, but
+   * review these: order matters for some metadata.
    */
   reordered: string[];
 };

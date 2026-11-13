@@ -38,8 +38,10 @@ type TypeVerifyResult = {
  *
  * The returned `drift` array is empty when every parent XML would survive the round trip
  * semantically; otherwise each entry names the offending file (relative to its package directory)
- * and a short reason. `reordered` is informational only -- sibling/attribute order is not
- * preserved by design, and Salesforce treats metadata as order-agnostic.
+ * and a short reason. `reordered` is informational: repeated siblings keep their order through the
+ * round trip (config-disassembler's `.element_order.json`), so it only lists files whose order
+ * can't be recorded, such as interleaved tags or grouped-by-tag `group` rules. It doesn't fail the
+ * run, but order matters for some metadata (picklist values, layout sections, approval steps).
  */
 export async function verifyMetadataTypes(options: VerifyOptions): Promise<VerifyResult> {
   const { metadataTypes, format, ignoreDirs, strategy, decomposeNestedPerms, manifest, overrides, log } = options;
@@ -133,14 +135,16 @@ export async function verifyMetadataTypes(options: VerifyOptions): Promise<Verif
                 typeResolved,
                 overrides,
               );
-              const effective = resolveEffectiveDisassembleOptions(metadataType, resolved);
+              // Type behavior (multi-level defaults, labels/bot rules) is keyed by the real suffix,
+              // which differs from `metadataType` when the type was selected by name.
+              const effective = resolveEffectiveDisassembleOptions(metaAttributes.metaSuffix, resolved);
 
               const result = await verifyXmlRoundtrip({
                 filePath: parent.filePath,
                 uniqueIdElements: metaAttributes.uniqueIdElements,
                 strategy: effective.strategy,
                 ignorePath,
-                fileExtension: `${metadataType}-meta.xml`,
+                fileExtension: `${metaAttributes.metaSuffix}-meta.xml`,
                 multiLevel: effective.multiLevel,
                 splitTags: effective.splitTags,
                 sidecarElements: effective.sidecarElements,
@@ -183,12 +187,15 @@ export async function verifyMetadataTypes(options: VerifyOptions): Promise<Verif
   }
 
   if (reordered.length > 0) {
-    // Informational only — semantic content matches, just sibling/attribute order changed.
-    // Salesforce treats metadata as order-agnostic, so this is safe to commit.
+    // Informational: content matches, only element order changed. Repeated siblings keep their
+    // order, so these are cases the round trip can't record (interleaved tags, `group` rules).
     log(`Note: ${reordered.length} file(s) round-tripped semantically but with sibling/attribute reordering:`);
     for (const path of reordered) {
       log(`  - ${path}`);
     }
+    log(
+      'Element order matters for some metadata (picklist values, layout sections, approval steps); review these before committing.',
+    );
   }
 
   return { metadata, drift, reordered };

@@ -14,7 +14,7 @@ mutate the source archive; everything happens in a per-type workspace under
 ## Indicators each script reports
 
 | Indicator                            | What it catches                                                                                                                            |
-|--------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | `origFiles != rebuiltFiles`          | A whole metadata file was lost on round-trip (severe).                                                                                     |
 | `contentSetDiff > 0`                 | Per-file `<name>` multiset differs between original and rebuilt — a uniqueIdElements collision dropped child elements.                     |
 | `parentOnlyDirs > 0`                 | A dotted-fullName type produced parent-only output dirs — the merge bug fixed by config-disassembler 0.4.4.                                |
@@ -62,6 +62,25 @@ metadata archive.
 npm run audit:roundtrip -- \
   --source-root /path/to/force-app/main/default
 ```
+
+### `npm run audit:classify` — schema-based leaf-only check
+
+Classifies every registry type from the Metadata API WSDL (`metadata.wsdl` in
+this directory) and prints the rows where `docs/METADATA_SUPPORT.md` disagrees.
+The disassembler only splits elements that have child elements, so a type
+whose schema has no complexType children (repeated text elements included) is
+**certainly leaf-only**. A type with complexType children is a decomposable
+**candidate**: real files may omit those elements, so confirm with
+`npm run audit` before marking it ✅. Types missing from the WSDL (features not
+enabled in the org it came from) are reported as unverified.
+
+```bash
+npm run audit:classify -- [--wsdl path/to/metadata.wsdl] [--md report.md] [--all]
+```
+
+To refresh the WSDL, use Setup → Integrations → API → Generate Metadata WSDL
+in an org on the target release. An org with more features enabled yields a
+more complete schema.
 
 ## Adjusting the type lists
 

@@ -1,9 +1,20 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!src/metadata/registry/metadataRegistry.json"]
+    "includes": [
+      "**",
+      "!src/metadata/registry/metadataRegistry.json",
+      "!CHANGELOG.md",
+      "!LICENSE.md",
+      "!THIRD_PARTY_NOTICES.md",
+      "!messages/**",
+      "!plugins/**/SKILL.md"
+    ]
+  },
+  "markdown": {
+    "formatter": { "enabled": true }
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
   "linter": {
@@ -96,6 +107,10 @@
     "globals": []
   },
   "overrides": [
+    {
+      "includes": ["plugins/*/.claude-plugin/plugin.json", ".release-please-manifest.json"],
+      "json": { "formatter": { "expand": "always" } }
+    },
     {
       "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "linter": {

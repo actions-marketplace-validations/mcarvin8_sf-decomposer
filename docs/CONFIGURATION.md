@@ -33,7 +33,7 @@ By default, a single decompose run uses one format and one strategy across every
 ### What can be overridden
 
 | Field                        | Notes                                                                                                                                                                                                                                                                                                                                                                                              |
-|------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `metadataTypes`              | Optional (required if `components` is omitted). Array of metadata suffixes (same vocabulary as `--metadata-type` / `metadataSuffixes`). Each suffix may appear in at most one override.                                                                                                                                                                                                            |
 | `components`                 | Optional (required if `metadataTypes` is omitted). Array of `<metadataSuffix>:<fullName>` keys (e.g. `permissionset:HR_Admin`, `report:MyFolder/MyReport`). Each component may appear in at most one override.                                                                                                                                                                                     |
 | `decomposedFormat`           | `xml` \| `json` \| `json5` \| `yaml`.                                                                                                                                                                                                                                                                                                                                                              |
@@ -53,8 +53,9 @@ Run-scope options (`metadataSuffixes`, `manifest`, `ignorePackageDirectories`) a
 The `<fullName>` part of a component key is the SDR fullName for the component, matching the basename of the decomposed directory:
 
 - **Plain types** (e.g. `permissionset`, `flow`, `profile`, `workflow`): use the file stem, e.g. `permissionset:HR_Admin` for `permissionsets/HR_Admin.permissionset-meta.xml`.
-- **Strict-directory types** (e.g. `bot`): use the bot directory name, e.g. `bot:My_Bot` for `bots/My_Bot/My_Bot.bot-meta.xml`.
-- **Folder-typed metadata** (e.g. `report`, `dashboard`, `email`, `document`): the unit of decomposition is the folder; use the folder name, e.g. `report:MyFolder` to scope every report inside `reports/MyFolder/`.
+- **Component-folder types** (e.g. `bot`): use the bot directory name, e.g. `bot:My_Bot` for `bots/My_Bot/My_Bot.bot-meta.xml`.
+- **Folder-typed metadata** (e.g. `report`, `dashboard`): the unit of decomposition is the folder; use the folder name, e.g. `report:MyFolder` to scope every report inside `reports/MyFolder/`.
+- **Types selected by name** (e.g. `CustomSite`, whose `site` suffix resolves to SiteDotCom): use the same name you pass to `-m`, both in `metadataTypes` and as the key prefix, e.g. `CustomSite:Customer_Portal`.
 - **`labels`**: there is exactly one labels file per labels directory, so component-scope keys are not meaningful — use the type-scope `metadataTypes: ["labels"]` instead.
 
 Component overrides are not a filter. If `--metadata` / `metadataSuffixes` includes `permissionset`, every permission set is still decomposed; the override only changes how the named ones are decomposed. Use `--manifest` / the hook's `manifest` field if you want to scope the run itself to a subset of components.
@@ -103,7 +104,7 @@ Each `<tag>` may appear at most once in a spec. The plugin validates the grammar
 
 > **Caveat:** With `mode: split`, the chosen `<field>` must produce a unique value across every array item — otherwise two items map to the same filename. If items can share a field value, use `mode: group` instead.
 
-See the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/HANDBOOK.md) for additional `splitTags` and `multiLevel` recipes (flows, workflows, layouts, flexipages, bots).
+See the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/docs/HANDBOOK.md) for additional `splitTags` and `multiLevel` recipes (flows, workflows, layouts, flexipages, bots).
 
 ### multiLevel grammar
 
@@ -145,7 +146,7 @@ Within one scope, the `(file_pattern, root_to_strip)` pair must be unique across
 
 > **Built-in defaults.** `bot` and `loyaltyProgramSetup` ship with built-in `multiLevel` rules, so you do not need an override to get the canonical layout — supply your own only to replace the default. Full registry: [`src/metadata/multiLevelDefaults.ts`](https://github.com/mcarvin8/sf-decomposer/blob/main/src/metadata/multiLevelDefaults.ts).
 >
-> **Pass all rules at once.** Sequential single-rule decomposes rewrite `.multi_level.json` and only the last rule survives — bundle every rule for a given component into one override. Use [`sf decomposer verify`](./README.md#sf-decomposer-verify) to confirm a new config round-trips before committing it.
+> **Pass all rules at once.** Sequential single-rule decomposes rewrite `.multi_level.json` and only the last rule survives — bundle every rule for a given component into one override. Use [`sf decomposer verify`](../README.md#sf-decomposer-verify) to confirm a new config round-trips before committing it.
 
 ### uniqueIdElements grammar
 

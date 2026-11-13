@@ -5,6 +5,160 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.16.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.15.0...v7.16.0) (2026-11-13)
+
+
+### Features
+
+* select metadata types that share a suffix by type name ([#683](https://github.com/mcarvin8/sf-decomposer/issues/683)) ([3db2e6d](https://github.com/mcarvin8/sf-decomposer/commit/3db2e6d4bac3d5644d73ed682112f22a5de25092))
+
+
+### Bug Fixes
+
+* **config-disassembler:** bump config-disassembler to 3.6.9 to preserve sibling order ([#684](https://github.com/mcarvin8/sf-decomposer/issues/684)) ([4b55973](https://github.com/mcarvin8/sf-decomposer/commit/4b5597302f0d2edef4e97edb6b4e3a561c1d098b))
+* only process the requested type's files in shared metadata directories ([#681](https://github.com/mcarvin8/sf-decomposer/issues/681)) ([633028a](https://github.com/mcarvin8/sf-decomposer/commit/633028a971366b37ac55b65221fcaa4294a00b9a))
+
+## [7.15.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.14.2...v7.15.0) (2026-11-12)
+
+
+### Features
+
+* let other coding agents install the sf-decomposer skills ([#673](https://github.com/mcarvin8/sf-decomposer/issues/673)) ([de681f7](https://github.com/mcarvin8/sf-decomposer/commit/de681f7b6c14c1f191b98e12dde1d42630570cd6))
+
+## [7.14.2](https://github.com/mcarvin8/sf-decomposer/compare/v7.14.1...v7.14.2) (2026-11-11)
+
+
+### Bug Fixes
+
+* **plugin:** stage only rebuilt original files in the setup hook ([#671](https://github.com/mcarvin8/sf-decomposer/issues/671)) ([979d7cd](https://github.com/mcarvin8/sf-decomposer/commit/979d7cd262023561a4ac4784cc9a54ab47ef43d7))
+
+## [7.14.1](https://github.com/mcarvin8/sf-decomposer/compare/v7.14.0...v7.14.1) (2026-11-11)
+
+
+### Bug Fixes
+
+* **plugin:** never rerun recompose after a partial postpurge ([#669](https://github.com/mcarvin8/sf-decomposer/issues/669)) ([0a36fbe](https://github.com/mcarvin8/sf-decomposer/commit/0a36fbe2939d4cf9d4f2aad0f7866c1f7dc64ccc))
+
+## [7.14.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.13.0...v7.14.0) (2026-11-11)
+
+
+### Features
+
+* add a Claude Code plugin with edit-metadata and setup skills ([#667](https://github.com/mcarvin8/sf-decomposer/issues/667)) ([e7c85ba](https://github.com/mcarvin8/sf-decomposer/commit/e7c85ba226d0d4a62b441e40cfcaa330ed2f5922))
+
+## [7.13.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.12.2...v7.13.0) (2026-11-11)
+
+
+### Features
+
+* publish sf-decomposer-core without Salesforce CLI dependencies ([#664](https://github.com/mcarvin8/sf-decomposer/issues/664)) ([6c046d0](https://github.com/mcarvin8/sf-decomposer/commit/6c046d099d78ac798ee1d73011937fa7f6ff9a7a))
+
+## [7.12.2](https://github.com/mcarvin8/sf-decomposer/compare/v7.12.1...v7.12.2) (2026-11-10)
+
+
+### Performance Improvements
+
+* **config-disassembler:** bump config-disassembler to 3.6.8 ([#662](https://github.com/mcarvin8/sf-decomposer/issues/662)) ([7c508af](https://github.com/mcarvin8/sf-decomposer/commit/7c508af3fdbb9dfa5834f46833ddb622d9509d28))
+
+## [7.12.1](https://github.com/mcarvin8/sf-decomposer/compare/v7.12.0...v7.12.1) (2026-11-09)
+
+
+### Bug Fixes
+
+* **hook:** move post-retrieve hook types out of helpers/types ([#660](https://github.com/mcarvin8/sf-decomposer/issues/660)) ([2a8b812](https://github.com/mcarvin8/sf-decomposer/commit/2a8b8120e2fc5274c70da72a9829d089caeb637c))
+
+## [7.12.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.8...v7.12.0) (2026-11-09)
+
+
+### Features
+
+* **metadata:** support ExperienceContainer ([#658](https://github.com/mcarvin8/sf-decomposer/issues/658)) ([3de99bd](https://github.com/mcarvin8/sf-decomposer/commit/3de99bd5a196cf17b7ff54bd0354e352b5df2b37))
+
+## [7.11.8](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.7...v7.11.8) (2026-11-08)
+
+
+### Performance Improvements
+
+* **recompose:** bound the package-directory walk's readdir concurrency ([#654](https://github.com/mcarvin8/sf-decomposer/issues/654)) ([c2e06c5](https://github.com/mcarvin8/sf-decomposer/commit/c2e06c565683e850f28788005a68a7981447521d))
+
+## [7.11.7](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.6...v7.11.7) (2026-11-08)
+
+
+### Performance Improvements
+
+* **config-disassembler:** bump config-disassembler to v3.6.7 ([#650](https://github.com/mcarvin8/sf-decomposer/issues/650)) ([8af2a6c](https://github.com/mcarvin8/sf-decomposer/commit/8af2a6c67eab94335aa51173133877a0c25fffe9))
+
+## [7.11.6](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.5...v7.11.6) (2026-11-07)
+
+
+### Performance Improvements
+
+* **config-disassembler:** bump config-disassembler to v3.6.6 ([#648](https://github.com/mcarvin8/sf-decomposer/issues/648)) ([8506179](https://github.com/mcarvin8/sf-decomposer/commit/85061795c3f77fd1fe62f6554aa41dc90d0abb58))
+
+## [7.11.5](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.4...v7.11.5) (2026-11-07)
+
+
+### Performance Improvements
+
+* **decompose:** add overrides perf scenario; raise per-file disassemble fan-out to 16 ([#646](https://github.com/mcarvin8/sf-decomposer/issues/646)) ([e0dd057](https://github.com/mcarvin8/sf-decomposer/commit/e0dd0577cc6bf64495727d46d11d0b062c954b60))
+
+## [7.11.4](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.3...v7.11.4) (2026-11-07)
+
+
+### Performance Improvements
+
+* **recompose:** skip the label shard move-back when postpurging ([#644](https://github.com/mcarvin8/sf-decomposer/issues/644)) ([969b8fb](https://github.com/mcarvin8/sf-decomposer/commit/969b8fb59ca5e8dbe522997a2910d05f0061b6ae))
+
+## [7.11.3](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.2...v7.11.3) (2026-11-06)
+
+
+### Performance Improvements
+
+* **config-disassembler:** bump config-disassembler to v3.6.5 ([#642](https://github.com/mcarvin8/sf-decomposer/issues/642)) ([ddfb12d](https://github.com/mcarvin8/sf-decomposer/commit/ddfb12d3ee4788ea89f6a49e6f6da66b0cf2aa76))
+
+## [7.11.2](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.1...v7.11.2) (2026-11-06)
+
+
+### Performance Improvements
+
+* **config-disassembler:** bump config-disassembler to v3.6.3 ([#639](https://github.com/mcarvin8/sf-decomposer/issues/639)) ([37bbb49](https://github.com/mcarvin8/sf-decomposer/commit/37bbb49b4f062f550fa46f7e01593709612a32ba))
+* **config-disassembler:** bump config-disassembler to v3.6.4 ([#641](https://github.com/mcarvin8/sf-decomposer/issues/641)) ([e959755](https://github.com/mcarvin8/sf-decomposer/commit/e9597553fb548887ec03a59edff398efbeaa671a))
+
+## [7.11.1](https://github.com/mcarvin8/sf-decomposer/compare/v7.11.0...v7.11.1) (2026-11-06)
+
+
+### Performance Improvements
+
+* **config-disassembler:** bump config-disassembler to v3.6.2 ([#637](https://github.com/mcarvin8/sf-decomposer/issues/637)) ([61d8aab](https://github.com/mcarvin8/sf-decomposer/commit/61d8aab79c9c8153b26448a5c4a0e8464ea7b5e3))
+
+## [7.11.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.10.0...v7.11.0) (2026-11-06)
+
+
+### Features
+
+* **config-disassembler:** bump config-disassembler to v3.6.0 ([#630](https://github.com/mcarvin8/sf-decomposer/issues/630)) ([d84155d](https://github.com/mcarvin8/sf-decomposer/commit/d84155dcfe16d4c7ee920b71828e603e0709fba8))
+
+## [7.10.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.9.0...v7.10.0) (2026-11-03)
+
+
+### Features
+
+* **metadata:** support NtfcnDefinition ([#623](https://github.com/mcarvin8/sf-decomposer/issues/623)) ([3e97177](https://github.com/mcarvin8/sf-decomposer/commit/3e971776c8535b8a3e25e4a4397fb77c41bdeaae))
+
+## [7.9.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.8.0...v7.9.0) (2026-11-02)
+
+
+### Features
+
+* **config-disassembler:** bump the config-disassembler group across 2 directories with 1 update ([#620](https://github.com/mcarvin8/sf-decomposer/issues/620)) ([a55a3dd](https://github.com/mcarvin8/sf-decomposer/commit/a55a3dd1390219768fa37c8e1e159e99e3364095))
+
+## [7.8.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.7.0...v7.8.0) (2026-10-31)
+
+
+### Features
+
+* **metadata:** support DebugLevel ([#616](https://github.com/mcarvin8/sf-decomposer/issues/616)) ([bcd2854](https://github.com/mcarvin8/sf-decomposer/commit/bcd28540df4f8d6ade5c5882a675ef1dead797db))
+
 ## [7.7.0](https://github.com/mcarvin8/sf-decomposer/compare/v7.6.0...v7.7.0) (2026-10-26)
 
 

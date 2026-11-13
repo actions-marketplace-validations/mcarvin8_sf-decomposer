@@ -12,6 +12,8 @@
 
 - Using the Salesforce CLI? Start at [Setup](#setup).
 - Running this in CI without the CLI? Skip straight to [GitHub Action](#github-action).
+- No Salesforce CLI at all? Use the [standalone command](#standalone-command-without-the-salesforce-cli) from `sf-decomposer-core`.
+- Using Claude Code, GitHub Copilot, or another AI coding agent? Install the [agent skills](#ai-coding-agent-skills).
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -25,11 +27,13 @@
 - [Daily Workflow](#daily-workflow)
 - [Commands](#commands)
 - [GitHub Action](#github-action)
+- [Standalone Command (without the Salesforce CLI)](#standalone-command-without-the-salesforce-cli)
+- [AI Coding Agent Skills](#ai-coding-agent-skills)
 - [Reference](#reference)
   - [Decompose Strategies](#decompose-strategies)
   - [Supported Metadata](#supported-metadata)
   - [Manifest-scoped Runs](#manifest-scoped-runs)
-  - [Per-Type & Per-Component Overrides](CONFIGURATION.md)
+  - [Per-Type & Per-Component Overrides](docs/CONFIGURATION.md)
   - [Ignore Files](#ignore-files)
   - [Using with sfdx-git-delta](#using-with-sfdx-git-delta)
   - [Troubleshooting](#troubleshooting)
@@ -58,7 +62,7 @@ Complete these steps once per project. After setup, see [Daily Workflow](#daily-
 sf-decomposer depends on [config-disassembler-node](https://github.com/mcarvin8/config-disassembler-node), which ships prebuilt native binaries as platform-specific optional npm packages — your package manager installs only the one matching your `os` / `cpu` / `libc`:
 
 | Platform    | Architectures                        |
-|-------------|--------------------------------------|
+| ----------- | ------------------------------------ |
 | **macOS**   | x64 (Intel), arm64 (Apple Silicon)   |
 | **Linux**   | x64 (gnu + musl), arm64 (gnu + musl) |
 | **Windows** | x64, arm64, ia32                     |
@@ -93,7 +97,7 @@ Add `.sfdecomposer.config.json` to your project root. Copy and customize one of 
 - [Sample with overrides](https://raw.githubusercontent.com/mcarvin8/sf-decomposer/main/examples/.sfdecomposer.config.overrides.json) — vary format/strategy per metadata type or component
 
 | Option                       | Required    | Description                                                                                                                                                                                                                 |
-|------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `metadataSuffixes`           | Conditional | Comma-separated metadata suffixes to decompose/recompose. Required unless `manifest` is set; when both are set, run is scoped to the intersection.                                                                          |
 | `manifest`                   | Conditional | Path (relative to project root) to a `package.xml` manifest. When set, only listed components are decomposed/recomposed.                                                                                                    |
 | `ignorePackageDirectories`   | No          | Comma-separated package directories to skip.                                                                                                                                                                                |
@@ -106,7 +110,7 @@ Add `.sfdecomposer.config.json` to your project root. Copy and customize one of 
 | `updateGitattributes`        | No          | Set `true` to automatically add root metadata file patterns to `.gitattributes` after each hook-triggered decomposition (default: false).                                                                                   |
 | `skipPrerunHook`             | No          | Set `true` to skip the automatic recompose that fires before `sf project deploy start/validate` (default: false). Useful when you recompose manually in a pre-commit hook and don't want a second recompose at deploy time. |
 | `skipPostRetrieveHook`       | No          | Set `true` to skip the automatic decompose that fires after `sf project retrieve start` (default: false).                                                                                                                   |
-| `overrides`                  | No          | Array of per-type and/or per-component overrides. See [CONFIGURATION.md](CONFIGURATION.md).                                                                                                                                 |
+| `overrides`                  | No          | Array of per-type and/or per-component overrides. See [CONFIGURATION.md](docs/CONFIGURATION.md).                                                                                                                            |
 
 ---
 
@@ -141,6 +145,7 @@ Pass `-x manifest/package.xml` to both `decompose` and `recompose` (and `deploy`
 
 ## Commands
 
+<!-- biome-ignore format: oclif readme writes this list with `*` bullets -->
 <!-- commands -->
 * [`sf decomposer decompose`](#sf-decomposer-decompose)
 * [`sf decomposer recompose`](#sf-decomposer-recompose)
@@ -171,7 +176,8 @@ FLAGS
       Ignore a package directory.
 
   -m, --metadata-type=<value>...
-      The metadata suffix to process, such as 'flow', 'labels', etc. Required unless --manifest is provided.
+      The metadata suffix to process, such as 'flow', 'labels', etc., or an exact type name such as 'CustomSite' for a
+      type whose suffix is shared with another type. Required unless --manifest is provided.
 
   -p, --decompose-nested-permissions
       Additionally decompose object and field permissions on a permission set when strategy is set to "grouped-by-tag".
@@ -220,7 +226,7 @@ EXAMPLES
   `sf decomposer decompose -x "manifest/package.xml" -m "flow"`
 ```
 
-_See code: [src/commands/decomposer/decompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.7.0/src/commands/decomposer/decompose.ts)_
+_See code: [src/commands/decomposer/decompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.16.0/src/commands/decomposer/decompose.ts)_
 
 ## `sf decomposer recompose`
 
@@ -238,8 +244,9 @@ FLAGS
                                              over config values. Makes --metadata-type and --manifest optional when
                                              either is defined in the config.
   -i, --ignore-package-directory=<value>...  Ignore a package directory.
-  -m, --metadata-type=<value>...             The metadata suffix to process, such as 'flow', 'labels', etc. Required
-                                             unless --manifest is provided.
+  -m, --metadata-type=<value>...             The metadata suffix to process, such as 'flow', 'labels', etc., or an exact
+                                             type name such as 'CustomSite' for a type whose suffix is shared with
+                                             another type. Required unless --manifest is provided.
   -x, --manifest=<value>                     Path to a package.xml manifest file. When provided, only the metadata
                                              listed in the manifest is recomposed. If --metadata-type is also provided,
                                              the intersection of the two is used.
@@ -266,7 +273,7 @@ EXAMPLES
   `sf decomposer recompose -x "manifest/package.xml" -m "flow"`
 ```
 
-_See code: [src/commands/decomposer/recompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.7.0/src/commands/decomposer/recompose.ts)_
+_See code: [src/commands/decomposer/recompose.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.16.0/src/commands/decomposer/recompose.ts)_
 
 ## `sf decomposer verify`
 
@@ -292,7 +299,8 @@ FLAGS
       Ignore a package directory.
 
   -m, --metadata-type=<value>...
-      The metadata suffix to verify, such as 'flow', 'labels', etc. Required unless --manifest is provided.
+      The metadata suffix to verify, such as 'flow', 'labels', etc., or an exact type name such as 'CustomSite' for a type
+      whose suffix is shared with another type. Required unless --manifest is provided.
 
   -p, --decompose-nested-permissions
       Additionally decompose object and field permissions on a permission set when strategy is set to "grouped-by-tag".
@@ -315,12 +323,17 @@ DESCRIPTION
   For every parent metadata XML file belonging to the requested metadata types, disassembles and
   reassembles it in an isolated temp directory using the same flags and `.sfdecomposer.config.json`
   overrides you would use in production, then compares the reconstructed XML against the original.
-  Comparison is **structural** (sibling and attribute order are ignored, matching how Salesforce
-  treats metadata). The command never modifies your working tree.
+  Comparison is **structural**: content must match, and element-order differences are reported
+  separately. The command never modifies your working tree.
 
-  Files where the only delta is ordering are surfaced as informational notices ("reordered") and do
-  not fail the run. Genuine semantic differences are reported as drift and exit non-zero, which
-  makes the command suitable as a CI gate before committing strategy, format, or override changes.
+  Repeated sibling elements keep their original order through a round trip (recorded in
+  `.element_order.json`), so files normally come back byte-identical. Files whose only delta is
+  element order are surfaced as informational notices ("reordered") and do not fail the run. This
+  happens when the order can't be recorded, for example different tags interleaved (`<a>`, `<b>`,
+  `<a>`) or a grouped-by-tag `group` rule. Some metadata depends on order (picklist values,
+  page-layout sections, approval steps), so review reordered files before committing. Genuine
+  semantic differences are reported as drift and exit non-zero, which makes the command suitable as
+  a CI gate before committing strategy, format, or override changes.
 
 EXAMPLES
   `sf decomposer verify -m "permissionset" -f "xml"`
@@ -330,7 +343,7 @@ EXAMPLES
   `sf decomposer verify -x "manifest/package.xml" --config`
 ```
 
-_See code: [src/commands/decomposer/verify.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.7.0/src/commands/decomposer/verify.ts)_
+_See code: [src/commands/decomposer/verify.ts](https://github.com/mcarvin8/sf-decomposer/blob/v7.16.0/src/commands/decomposer/verify.ts)_
 <!-- commandsstop -->
 
 ---
@@ -349,13 +362,13 @@ _See code: [src/commands/decomposer/verify.ts](https://github.com/mcarvin8/sf-de
     metadata-type: |
       permissionset
       flow
-    postpurge: 'true'
+    postpurge: "true"
 
 - name: Verify the round trip before merging
   uses: mcarvin8/sf-decomposer@v7
   with:
     mode: verify
-    config: 'true'
+    config: "true"
 ```
 
 Or point it at an existing `.sfdecomposer.config.json` for either step instead of listing flags: `with: { mode: decompose, config: 'true' }`.
@@ -363,7 +376,7 @@ Or point it at an existing `.sfdecomposer.config.json` for either step instead o
 **Inputs** (all optional except `mode`; multi-value inputs are newline-separated, matching `actions/checkout`'s own multiline convention):
 
 | Input                          | Used by              | Description                                                                       |
-|--------------------------------|----------------------|-----------------------------------------------------------------------------------|
+| ------------------------------ | -------------------- | --------------------------------------------------------------------------------- |
 | `mode`                         | all                  | `decompose`, `recompose`, or `verify`.                                            |
 | `metadata-type`                | all                  | Metadata suffix(es) to process, one per line.                                     |
 | `manifest`                     | all                  | Path to a package.xml manifest to scope the run to.                               |
@@ -383,13 +396,107 @@ See [`action.yml`](action.yml) for the full input/output reference.
 
 ---
 
+## Standalone Command (without the Salesforce CLI)
+
+[`sf-decomposer-core`](https://www.npmjs.com/package/sf-decomposer-core) publishes the same decompose, recompose, and verify logic as a plain Node.js command, `sf-decomposer`, with no Salesforce CLI and no plugin install. Its only dependency is `config-disassembler`. Flags, `.sfdecomposer.config.json`, and output match `sf decomposer <command>`, plus `--json`.
+
+```bash
+npx sf-decomposer-core decompose -m "flow" -m "permissionset"
+npx sf-decomposer-core recompose -m "flow" -m "permissionset" --postpurge
+npx sf-decomposer-core verify -x "manifest/package.xml" --config
+```
+
+The retrieve/deploy [hooks](#4-configure-hooks-recommended) need the Salesforce CLI, so run `decompose` and `recompose` yourself (or from a pre-commit hook) when using the standalone command. The package also exports a programmatic API; see [its README](packages/core/README.md).
+
+---
+
+## AI Coding Agent Skills
+
+Two [Agent Skills](https://agentskills.io) let Claude Code, GitHub Copilot, and other coding agents work with large metadata files through sf-decomposer. Both run [`sf-decomposer-core`](#standalone-command-without-the-salesforce-cli) with `npx`, so they need Node.js 22.19+ and no Salesforce CLI.
+
+| Skill                         | What it does                                                                                                                                                                                                                                                                                    |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sf-decomposer-edit-metadata` | Reads, compares, or changes large metadata files, such as "give Sales Ops read on Account.Industry" or "which permission sets can edit Opportunity.Amount". In projects that don't use sf-decomposer, it splits only the files it needs and rebuilds them, so only the intended change remains. |
+| `sf-decomposer-setup`         | Sets up sf-decomposer in a project: types, strategy and format, a round-trip check, `.sfdecomposer.config.json`, `.forceignore`, `.gitattributes`, and a recompose hook.                                                                                                                        |
+
+```sh
+# Claude Code (type these inside a Claude Code session)
+/plugin marketplace add mcarvin8/sf-decomposer
+/plugin install sf-decomposer@sf-decomposer
+
+# GitHub Copilot CLI (reads the same marketplace files)
+copilot plugin marketplace add mcarvin8/sf-decomposer
+copilot plugin install sf-decomposer@sf-decomposer
+
+# Any agent, with the skills CLI (skills.sh.json points it at plugins/sf-decomposer/skills)
+npx skills add mcarvin8/sf-decomposer
+
+# Any agent, with the GitHub CLI
+gh skill install mcarvin8/sf-decomposer --agent github-copilot
+```
+
+See the [plugin README](plugins/sf-decomposer/README.md) for example requests and data handling.
+
+---
+
 ## Reference
 
 ### Decompose Strategies
 
-Two primary strategies control how nested XML elements are split on disk. Both round-trip deterministically and can be mixed across types — or even across components of the same type — via the `overrides` array (see [CONFIGURATION.md](CONFIGURATION.md)). When switching strategies for an existing component, pass `--prepurge` (or `prePurge: true`) to remove leftover files from the prior strategy before writing new ones.
+Two primary strategies control how nested XML elements are split on disk. Both round-trip deterministically and can be mixed across types — or even across components of the same type — via the `overrides` array (see [CONFIGURATION.md](docs/CONFIGURATION.md)). When switching strategies for an existing component, pass `--prepurge` (or `prePurge: true`) to remove leftover files from the prior strategy before writing new ones.
 
-#### unique-id (default)
+**Nested vs. leaf elements**
+
+The decomposition strategies operate on nested XML elements. A nested element is a child of the root element that contains its own child elements. These are the entries split into separate files or subdirectories. Nesting is what matters, not repetition: a nested element is split out even if it appears only once. In practice, though, most nested elements are repeatable blocks such as `<fieldPermissions>`.
+
+A leaf element is a property or scalar value that contains only text, with no child elements. Leaf content stays in the original XML file unless the type's decomposition rules explicitly extract it to a sidecar file (see `externalServiceRegistration`). This holds even when a leaf element repeats: a list like `<narrowComponents>` on a home page layout is still leaf content.
+
+A file with no nested elements at all is **leaf-only**: there is nothing to split, so decompose skips it and leaves it untouched (logged at `RUST_LOG=error`, not a failure). [METADATA_SUPPORT.md](./docs/METADATA_SUPPORT.md) lists which types are leaf-only.
+
+Example:
+
+```xml
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <label>HR Admin</label>
+  <description>Access for HR admins</description>
+
+  <fieldPermissions>
+    <field>Job_Request__c.SalaryPay__c</field>
+    <editable>true</editable>
+    <readable>true</readable>
+  </fieldPermissions>
+
+  <fieldPermissions>
+    <field>Job_Request__c.Salary__c</field>
+    <editable>false</editable>
+    <readable>true</readable>
+  </fieldPermissions>
+</PermissionSet>
+```
+
+Nested elements:
+
+```xml
+<fieldPermissions>
+    <field>Job_Request__c.SalaryPay__c</field>
+    <editable>true</editable>
+    <readable>true</readable>
+</fieldPermissions>
+<fieldPermissions>
+    <field>Job_Request__c.Salary__c</field>
+    <editable>false</editable>
+    <readable>true</readable>
+</fieldPermissions>
+```
+
+Leaf/scalar elements:
+
+```xml
+<label>HR Admin</label>
+<description>Access for HR admins</description>
+```
+
+#### unique-id strategy (default)
 
 Each nested element gets its own file, named by one or more unique-id fields (or a content hash when no UID is found). Leaf elements stay in a file named like the original XML.
 
@@ -424,7 +531,7 @@ permissionsets/
 
 If you see a hash-named shard and want to know whether it came from a collision (vs. a missing UID), set `RUST_LOG=warn` and rerun — see [Rust crate logging](#xml-disassemble-output-rust-crate).
 
-**Extending with multiLevel.** When a metadata type has deeply-nested repeatable blocks (a block inside a block), add a `multiLevel` override to decompose those inner arrays into their own subdirectories. `bot` and `loyaltyProgramSetup` ship with built-in `multiLevel` defaults applied automatically. See the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/HANDBOOK.md) for ready-to-paste recipes for Bots, Flexipages, Layouts, Flows, and more.
+**Extending with multiLevel.** When a metadata type has deeply-nested repeatable blocks (a block inside a block), add a `multiLevel` override to decompose those inner arrays into their own subdirectories. `bot` and `loyaltyProgramSetup` ship with built-in `multiLevel` defaults applied automatically. See the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/docs/HANDBOOK.md) for ready-to-paste recipes for Bots, Flexipages, Layouts, Flows, and more.
 
 **Type-specific notes (unique-id):**
 
@@ -437,7 +544,7 @@ If you see a hash-named shard and want to know whether it came from a collision 
   └── quoteManual.label-meta.xml
   ```
 
-- **Bot (`bot`)** — built-in `multiLevel` default applies two rules automatically: `botDialogs` (outer, keyed by `developerName`) and `botSteps` (inner, keyed by `type`). No config needed to get the canonical layout; override only to change it. See the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/HANDBOOK.md) for the full layout, step-shape notes, and single-rule variant.
+- **Bot (`bot`)** — built-in `multiLevel` default applies two rules automatically: `botDialogs` (outer, keyed by `developerName`) and `botSteps` (inner, keyed by `type`). No config needed to get the canonical layout; override only to change it. See the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/docs/HANDBOOK.md) for the full layout, step-shape notes, and single-rule variant.
 
   ```
   bots/
@@ -496,7 +603,7 @@ If you see a hash-named shard and want to know whether it came from a collision 
           └── uploadFile.operations-meta.xml
   ```
 
-#### grouped-by-tag
+#### grouped-by-tag strategy
 
 All elements with the same tag (e.g. `<fieldPermissions>`) go into one file named after the tag (e.g. `fieldPermissions.xml`). Leaf elements are still grouped in the original-named file. Best for types with many small repeatable tags where one-file-per-element diffs would be noisy.
 
@@ -515,7 +622,7 @@ permissionsets/
     └── userPermissions.xml
 ```
 
-**Extending with splitTags.** A `splitTags` override lets specific tags within a `grouped-by-tag` run break out into per-element files (split mode) or sub-grouped files (group mode), while all other tags stay grouped. See [splitTags grammar](CONFIGURATION.md#splittags-grammar).
+**Extending with splitTags.** A `splitTags` override lets specific tags within a `grouped-by-tag` run break out into per-element files (split mode) or sub-grouped files (group mode), while all other tags stay grouped. See [splitTags grammar](docs/CONFIGURATION.md#splittags-grammar).
 
 **Extending with decomposeNestedPermissions.** For `permissionset` and `mutingpermissionset`, add `--decompose-nested-permissions` (`-p`) to further decompose `<objectPermissions>` into per-object files and group `<fieldPermissions>` by object — similar to Salesforce's `decomposePermissionSetBeta2` but with more format and strategy options.
 
@@ -547,34 +654,35 @@ permissionsets/
 
 All parent and child metadata types from this plugin's vendored copy of the [@salesforce/source-deploy-retrieve](https://github.com/forcedotcom/source-deploy-retrieve) (SDR) metadata registry are supported, except where noted below. Child types (e.g. `field`, `listView`, `validationRule`) resolve via their parent in the registry and behave like any other type — most are leaf-only and will be skipped non-fatally if their files contain no nested repeatable elements (the Rust disassembler logs a skip at `RUST_LOG=error`, but the CLI does not fail).
 
-Use the metadata **suffix** for `-m` / `--metadata-type`, as in the vendored [`metadataRegistry.json`](src/metadata/registry/metadataRegistry.json) (synced weekly from upstream SDR — see [`sync-metadata-registry.yml`](.github/workflows/sync-metadata-registry.yml)), or infer from the file name: `*.{suffix}-meta.xml`.
+Use the metadata **suffix** for `-m` / `--metadata-type`, as in the vendored [`metadataRegistry.json`](src/metadata/registry/metadataRegistry.json) (synced weekly from upstream SDR — see [`sync-metadata-registry.yml`](.github/workflows/sync-metadata-registry.yml)), or infer from the file name: `*.{suffix}-meta.xml`. A few suffixes are shared by more than one type (e.g. `site` is both SiteDotCom and CustomSite) and only select one of them; pass the exact type name instead (`-m CustomSite`) to select another. Config `overrides` use the same value you pass to `-m`.
 
 **Common Examples:**
 
-| Metadata Type                 | CLI value                     | Notes                                                                                                                                                                                                                                                                                                                 |
-|-------------------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Custom Labels                 | `labels`                      | Strategy overridden to `unique-id` if `grouped-by-tag` is provided (grouping labels by tag would be no different from the original file).                                                                                                                                                                             |
-| Workflows                     | `workflow`                    |                                                                                                                                                                                                                                                                                                                       |
-| Profiles                      | `profile`                     |                                                                                                                                                                                                                                                                                                                       |
-| Permission Sets               | `permissionset`               | Supports `--decompose-nested-permissions` with grouped-by-tag.                                                                                                                                                                                                                                                        |
-| Muting Permission Sets        | `mutingpermissionset`         | Extends permission set metadata type. Supports `--decompose-nested-permissions` with grouped-by-tag.                                                                                                                                                                                                                  |
-| AI Scoring Model Definition   | `aiScoringModelDefinition`    |                                                                                                                                                                                                                                                                                                                       |
-| Decision Matrix Definition    | `decisionMatrixDefinition`    |                                                                                                                                                                                                                                                                                                                       |
-| Bot                           | `bot`                         | Built-in `multiLevel` default splits `botDialogs` (by `developerName`) and `botSteps` (by `type`) automatically. No config required; override only to change the layout. See [Decompose Strategies](#decompose-strategies) and the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/HANDBOOK.md). |
-| Marketing App Extension       | `marketingappextension`       |                                                                                                                                                                                                                                                                                                                       |
-| Loyalty Program Setup         | `loyaltyProgramSetup`         | Always forced to `unique-id`; `grouped-by-tag` is overridden. Built-in `multiLevel` splits `<programProcesses>` into per-process folders automatically. Recompose always removes the decomposed tree. See [Decompose Strategies](#decompose-strategies).                                                              |
-| External Service Registration | `externalServiceRegistration` | The `<schema>` field is always extracted to a sidecar YAML file (format forced to YAML regardless of `--format`). The `<operations>` array follows normal `unique-id` decomposition, named by `<name>`. See [Decompose Strategies](#decompose-strategies).                                                            |
+| Metadata Type                 | CLI value                     | Notes                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Custom Labels                 | `labels`                      | Strategy overridden to `unique-id` if `grouped-by-tag` is provided (grouping labels by tag would be no different from the original file).                                                                                                                                                                                  |
+| Workflows                     | `workflow`                    |                                                                                                                                                                                                                                                                                                                            |
+| Profiles                      | `profile`                     |                                                                                                                                                                                                                                                                                                                            |
+| Permission Sets               | `permissionset`               | Supports `--decompose-nested-permissions` with grouped-by-tag.                                                                                                                                                                                                                                                             |
+| Muting Permission Sets        | `mutingpermissionset`         | Extends permission set metadata type. Supports `--decompose-nested-permissions` with grouped-by-tag.                                                                                                                                                                                                                       |
+| AI Scoring Model Definition   | `aiScoringModelDefinition`    |                                                                                                                                                                                                                                                                                                                            |
+| Decision Matrix Definition    | `decisionMatrixDefinition`    |                                                                                                                                                                                                                                                                                                                            |
+| Bot                           | `bot`                         | Built-in `multiLevel` default splits `botDialogs` (by `developerName`) and `botSteps` (by `type`) automatically. No config required; override only to change the layout. See [Decompose Strategies](#decompose-strategies) and the [admin handbook](https://github.com/mcarvin8/sf-decomposer/blob/main/docs/HANDBOOK.md). |
+| Marketing App Extension       | `marketingappextension`       |                                                                                                                                                                                                                                                                                                                            |
+| Loyalty Program Setup         | `loyaltyProgramSetup`         | Always forced to `unique-id`; `grouped-by-tag` is overridden. Built-in `multiLevel` splits `<programProcesses>` into per-process folders automatically. Recompose always removes the decomposed tree. See [Decompose Strategies](#decompose-strategies).                                                                   |
+| External Service Registration | `externalServiceRegistration` | The `<schema>` field is always extracted to a sidecar YAML file (format forced to YAML regardless of `--format`). The `<operations>` array follows normal `unique-id` decomposition, named by `<name>`. See [Decompose Strategies](#decompose-strategies).                                                                 |
 
-For a comprehensive breakdown of supported, leaf-only, and unsupported metadata types — including multi-level decomposition patterns, Salesforce native decomposition conflicts, and adapter strategy limitations — see [**METADATA_SUPPORT.md**](./METADATA_SUPPORT.md).
+For a comprehensive breakdown of supported, leaf-only, and unsupported metadata types — including multi-level decomposition patterns, Salesforce native decomposition conflicts, and adapter strategy limitations — see [**METADATA_SUPPORT.md**](./docs/METADATA_SUPPORT.md).
 
 #### Exceptions
 
-| Situation                                                                                      | Message                                                                                                                           |
-|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `botVersion` used directly                                                                     | Automatically redirected to `bot` with a warning. No error is thrown.                                                             |
-| Custom Objects                                                                                 | `Custom Objects are not supported by this plugin.`                                                                                |
-| Unsupported SDR strategies (e.g. matchingContentFile, digitalExperience, mixedContent, bundle) | `Metadata types with [matchingContentFile, digitalExperience, mixedContent, bundle] strategies are not supported by this plugin.` |
-| Invalid or unknown suffix                                                                      | `Metadata type not found for the given suffix: [suffix].`                                                                         |
+| Situation                                                                                                             | Message                                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `botVersion` used directly                                                                                            | Automatically redirected to `bot` with a warning. No error is thrown.                                                             |
+| Child type stored with its parent (e.g. `assignmentRule`, `sharingCriteriaRule`, `workflowAlert`, `fieldTranslation`) | Automatically redirected to the parent suffix (e.g. `assignmentRules`) with a warning. No error is thrown.                        |
+| Custom Objects                                                                                                        | `Custom Objects are not supported by this plugin.`                                                                                |
+| Unsupported SDR strategies (e.g. matchingContentFile, digitalExperience, mixedContent, bundle)                        | `Metadata types with [matchingContentFile, digitalExperience, mixedContent, bundle] strategies are not supported by this plugin.` |
+| Invalid or unknown suffix or type name                                                                                | `Metadata type not found for the given suffix or type name: [value].`                                                             |
 
 ---
 
@@ -615,7 +723,7 @@ sf project deploy start -x "manifest/package.xml"
 
 The optional `overrides` array in `.sfdecomposer.config.json` lets you vary format, strategy, and decomposition options per metadata suffix or per individual component without splitting the run into multiple invocations.
 
-See [CONFIGURATION.md](CONFIGURATION.md) for the full reference: override fields, component key conventions, precedence rules, and grammar for `splitTags`, `multiLevel`, and `uniqueIdElements`.
+See [CONFIGURATION.md](docs/CONFIGURATION.md) for the full reference: override fields, component key conventions, precedence rules, and grammar for `splitTags`, `multiLevel`, and `uniqueIdElements`.
 
 ---
 
@@ -625,7 +733,7 @@ See [CONFIGURATION.md](CONFIGURATION.md) for the full reference: override fields
 
 The Salesforce CLI must **ignore** decomposed files and **allow** recomposed files. Use `--update-forceignore` on your first `sf decomposer decompose` run to populate this file automatically, or copy the [sample .forceignore](https://raw.githubusercontent.com/mcarvin8/sf-decomposer/main/examples/.forceignore) and set patterns for the extensions you use (`.xml`, `.json`, `.yaml`, etc.).
 
-> **Note:** For each processed type, `--update-forceignore` adds a pattern like `**/flows/**/*.xml` (ignore all decomposed pieces) plus `!**/flows/*.flow-meta.xml` (re-allow the original file). Labels use a flat pattern (`**/labels/*.xml` + `!**/labels/CustomLabels.labels-meta.xml`) since they decompose directly into the type directory. Bots use a component-dir pattern (`**/bots/**/*.xml` + `!**/bots/*/*.bot-meta.xml` + `!**/bots/*/*.botVersion-meta.xml`) to handle nested decomposed files and both original suffixes.
+> **Note:** For each processed type, `--update-forceignore` adds a pattern like `**/flows/**/*.xml` (ignore all decomposed pieces) plus `!**/flows/*.flow-meta.xml` (re-allow the original file). Labels use a flat pattern (`**/labels/*.xml` + `!**/labels/CustomLabels.labels-meta.xml`) since they decompose directly into the type directory. Bots use a component-dir pattern (`**/bots/**/*.xml` + `!**/bots/*/*.bot-meta.xml` + `!**/bots/*/*.botVersion-meta.xml`) to handle nested decomposed files and both original suffixes. Directories shared by several metadata types (e.g. `moderation`, which holds both `keywords` and `rule` files) use a nested-only pattern (`**/moderation/*/**/*.xml`) so the other types' original files stay deployable; decompose and recompose likewise only touch the requested type's files there.
 
 #### .sfdecomposerignore
 
@@ -721,8 +829,8 @@ The sf-decomposer prerun hook recomposes automatically when `sf project deploy s
 
 If you use the prerun hook, do not combine it with `--postpurge` and sgd. The compatible combinations are:
 
-| Setup                                                             | Works?                                                                         |
-|-------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| Setup                                                             | Works?                                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | No `--postpurge` + sgd + hook                                     | ✅ Root files in git; hook recompose at deploy is harmless (redundant but safe) |
 | No `--postpurge` + sgd + pre-commit hook + `skipPrerunHook: true` | ✅ Recomposed before commit; deploy hook skipped intentionally                  |
 | No `--postpurge` + sgd, no hook                                   | ✅ Recompose manually before commit                                             |
@@ -782,7 +890,7 @@ This cleanup doesn't work with `grouped-by-tag`, because all entries for a tag s
 The underlying Rust crate logs through [env_logger](https://docs.rs/env_logger). Set `RUST_LOG` to opt into more verbosity:
 
 | Level            | What it covers                                                                                                                                                                                |
-|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `RUST_LOG=error` | Default. Parse errors and skipped files (leaf-only XML — primitives only, nothing to decompose).                                                                                              |
 | `RUST_LOG=warn`  | Adds [sibling-collision fallback](#filename-safety-unique-id) signals — one line per colliding group (parent tag, collided id, sibling count). **Recommended in CI** when shipping overrides. |
 | `RUST_LOG=off`   | Disables rust crate logging. **Recommended** for the `sf decomposer verify` command.                                                                                                          |
@@ -807,7 +915,7 @@ Example `WARN` (CustomApplication where four `actionOverrides` siblings shared t
 
 ## Migrating from Native Decomposition
 
-Already using Salesforce CLI built-in `decomposePermissionSetBeta2`, `decomposeCustomLabelsBeta`, or similar presets? See [MIGRATION.md](https://github.com/mcarvin8/sf-decomposer/blob/main/MIGRATION.md) before switching over to sf-decomposer.
+Already using Salesforce CLI built-in `decomposePermissionSetBeta2`, `decomposeCustomLabelsBeta`, or similar presets? See [MIGRATION.md](https://github.com/mcarvin8/sf-decomposer/blob/main/docs/MIGRATION.md) before switching over to sf-decomposer.
 
 ---
 
